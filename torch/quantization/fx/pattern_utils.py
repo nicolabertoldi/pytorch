@@ -56,6 +56,12 @@ def mark_input_output_not_observed():
 def input_output_observed(qh):
     return type(qh) not in DEFAULT_NOT_OBSERVED_QUANTIZE_HANDLER
 
+
+class MatchAllNode:
+    """ A node pattern that matches all nodes
+    """
+    pass
+
 # Example use of register pattern function:
 # @register_fusion_pattern(torch.nn.ReLU, (torch.nn.BatchNorm2d, torch.nn.Conv2d)))
 # class ConvBNReLUFusion():
@@ -81,6 +87,9 @@ def is_match(modules, node, pattern, max_uses=sys.maxsize):
 
     if len(node.users) > max_uses:
         return False
+
+    if isinstance(self_match, type) and issubclass(self_match, MatchAllNode):
+        return True
 
     if isinstance(self_match, type) and issubclass(self_match, torch.nn.Module):
         if node.op != 'call_module':
